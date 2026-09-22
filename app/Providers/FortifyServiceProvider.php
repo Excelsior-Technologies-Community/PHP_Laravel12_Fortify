@@ -30,16 +30,26 @@ class FortifyServiceProvider extends ServiceProvider
         */
 
         Fortify::createUsersUsing(CreateNewUser::class);
-        Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
-        Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
-        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+
+        Fortify::updateUserProfileInformationUsing(
+            UpdateUserProfileInformation::class
+        );
+
+        Fortify::updateUserPasswordsUsing(
+            UpdateUserPassword::class
+        );
+
+        Fortify::resetUserPasswordsUsing(
+            ResetUserPassword::class
+        );
+
         Fortify::redirectUserForTwoFactorAuthenticationUsing(
             RedirectIfTwoFactorAuthenticatable::class
         );
 
         /*
         |--------------------------------------------------------------------------
-        | ✅ AUTH VIEWS (IMPORTANT PART)
+        | Authentication Views
         |--------------------------------------------------------------------------
         */
 
@@ -57,19 +67,42 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::resetPasswordView(function ($request) {
             return view('auth.reset-password', [
-                'request' => $request
+                'request' => $request,
             ]);
         });
 
         /*
         |--------------------------------------------------------------------------
-        | Rate Limiting
+        | Password Confirmation View
+        |--------------------------------------------------------------------------
+        */
+
+        Fortify::confirmPasswordView(function () {
+            return view('auth.confirm-password');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Two-Factor Authentication Challenge View
+        |--------------------------------------------------------------------------
+        */
+
+        Fortify::twoFactorChallengeView(function () {
+            return view('auth.two-factor-challenge');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Login Rate Limiting
         |--------------------------------------------------------------------------
         */
 
         RateLimiter::for('login', function (Request $request) {
+
             $throttleKey = Str::transliterate(
-                Str::lower($request->input(Fortify::username())) .
+                Str::lower(
+                    $request->input(Fortify::username())
+                ) .
                 '|' .
                 $request->ip()
             );
@@ -77,7 +110,14 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($throttleKey);
         });
 
+        /*
+        |--------------------------------------------------------------------------
+        | Two-Factor Rate Limiting
+        |--------------------------------------------------------------------------
+        */
+
         RateLimiter::for('two-factor', function (Request $request) {
+
             return Limit::perMinute(5)->by(
                 $request->session()->get('login.id')
             );
