@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthenticationActivityController;
+use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\TwoFactorController;
 use Illuminate\Support\Facades\Route;
@@ -35,7 +39,50 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Two-Factor Authentication Security Manager
+    | Profile Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/security/profile',
+        [ProfileController::class, 'index']
+    )->name('security.profile');
+
+    Route::post(
+        '/security/profile',
+        [ProfileController::class, 'update']
+    )->name('security.profile.update');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Change Password
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/security/password',
+        [PasswordController::class, 'index']
+    )->name('security.password');
+
+    Route::post(
+        '/security/password',
+        [PasswordController::class, 'update']
+    )->name('security.password.update');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Security Overview
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/security',
+        [SecurityController::class, 'index']
+    )->name('security.overview');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Two-Factor Authentication
     |--------------------------------------------------------------------------
     */
 
@@ -46,7 +93,7 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Activity & Login History
+    | Authentication Activity
     |--------------------------------------------------------------------------
     */
 
@@ -55,9 +102,14 @@ Route::middleware(['auth'])->group(function () {
         [AuthenticationActivityController::class, 'index']
     )->name('security.login-history');
 
+    Route::get(
+        '/security/login-history/export',
+        [AuthenticationActivityController::class, 'export']
+    )->name('security.login-history.export');
+
     /*
     |--------------------------------------------------------------------------
-    | Active Sessions & Device Management
+    | Active Sessions
     |--------------------------------------------------------------------------
     */
 
@@ -76,4 +128,19 @@ Route::middleware(['auth'])->group(function () {
         [SessionController::class, 'revokeOthers']
     )->name('security.sessions.revoke-others');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Delete Account
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/security/delete-account',
+        [AccountController::class, 'index']
+    )->name('security.delete-account');
+
+    Route::delete(
+        '/security/delete-account',
+        [AccountController::class, 'destroy']
+    )->name('security.delete-account.destroy');
 });

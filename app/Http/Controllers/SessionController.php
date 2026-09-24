@@ -12,36 +12,75 @@ class SessionController extends Controller
      */
     public function index(Request $request)
     {
-        $sessions = DB::table('sessions')
-            ->where('user_id', $request->user()->id)
+        $query = DB::table('sessions')
+            ->where(
+                'user_id',
+                $request->user()->id
+            );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Session Search
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where(
+                    'ip_address',
+                    'like',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'user_agent',
+                    'like',
+                    "%{$search}%"
+                );
+            });
+        }
+
+        $sessions = $query
             ->orderByDesc('last_activity')
             ->get();
 
-        $currentSessionId = $request->session()->getId();
+        $currentSessionId = $request
+            ->session()
+            ->getId();
 
-        $sessionData = $sessions->map(function ($session) use ($currentSessionId) {
+        $sessionData = $sessions->map(
+            function ($session) use ($currentSessionId) {
 
-            return [
-                'id' => $session->id,
-                'ip_address' => $session->ip_address,
-                'user_agent' => $session->user_agent,
-                'last_activity' => $session->last_activity,
-                'is_current' => $session->id === $currentSessionId,
-            ];
+                return [
+                    'id' => $session->id,
+                    'ip_address' => $session->ip_address,
+                    'user_agent' => $session->user_agent,
+                    'last_activity' => $session->last_activity,
+                    'is_current' =>
+                        $session->id === $currentSessionId,
+                ];
+            }
+        );
 
-        });
-
-        return view('security.sessions', [
-            'sessions' => $sessionData,
-        ]);
+        return view(
+            'security.sessions',
+            [
+                'sessions' => $sessionData,
+            ]
+        );
     }
 
     /**
      * Revoke one session.
      */
-    public function revoke(Request $request, string $sessionId)
-    {
-        $currentSessionId = $request->session()->getId();
+    public function revoke(
+        Request $request,
+        string $sessionId
+    ) {
+        $currentSessionId = $request
+            ->session()
+            ->getId();
 
         if ($sessionId === $currentSessionId) {
             return back()->with(
@@ -52,7 +91,10 @@ class SessionController extends Controller
 
         DB::table('sessions')
             ->where('id', $sessionId)
-            ->where('user_id', $request->user()->id)
+            ->where(
+                'user_id',
+                $request->user()->id
+            )
             ->delete();
 
         return back()->with(
@@ -66,11 +108,20 @@ class SessionController extends Controller
      */
     public function revokeOthers(Request $request)
     {
-        $currentSessionId = $request->session()->getId();
+        $currentSessionId = $request
+            ->session()
+            ->getId();
 
         DB::table('sessions')
-            ->where('user_id', $request->user()->id)
-            ->where('id', '!=', $currentSessionId)
+            ->where(
+                'user_id',
+                $request->user()->id
+            )
+            ->where(
+                'id',
+                '!=',
+                $currentSessionId
+            )
             ->delete();
 
         return back()->with(
