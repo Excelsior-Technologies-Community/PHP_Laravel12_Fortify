@@ -3,24 +3,28 @@
 
 <head>
 
-    <title>Dashboard</title>
+    <title>Fortify Security Dashboard</title>
 
     <style>
 
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
 
         body {
+            margin: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background:
+                linear-gradient(
+                    135deg,
+                    #667eea,
+                    #764ba2
+                );
         }
 
         .navbar {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,.15);
             backdrop-filter: blur(10px);
             padding: 15px 30px;
             display: flex;
@@ -40,24 +44,30 @@
         }
 
         .container {
-            max-width: 1000px;
-            margin: 50px auto;
+            max-width: 1150px;
+            margin: 45px auto;
             padding: 20px;
         }
 
         .welcome-card {
             background: white;
-            padding: 40px;
+            padding: 35px;
             text-align: center;
             border-radius: 14px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow:
+                0 20px 40px rgba(0,0,0,.2);
             margin-bottom: 30px;
         }
 
         .avatar {
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg,#667eea,#764ba2);
+            background:
+                linear-gradient(
+                    135deg,
+                    #667eea,
+                    #764ba2
+                );
             color: white;
             border-radius: 50%;
             display: flex;
@@ -68,27 +78,10 @@
             margin: 0 auto 20px;
         }
 
-        h1 {
-            margin-bottom: 10px;
-        }
-
-        .welcome {
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .badge {
-            background: linear-gradient(135deg,#667eea,#764ba2);
-            color: white;
-            padding: 10px 22px;
-            border-radius: 25px;
-            display: inline-block;
-            font-size: 14px;
-        }
-
         .security-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns:
+                repeat(3, 1fr);
             gap: 20px;
         }
 
@@ -96,18 +89,18 @@
             background: white;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,.15);
+            box-shadow:
+                0 10px 25px rgba(0,0,0,.15);
         }
 
         .security-card h2 {
-            margin-bottom: 12px;
-            font-size: 20px;
+            font-size: 19px;
         }
 
         .security-card p {
             color: #666;
             line-height: 1.5;
-            margin-bottom: 20px;
+            min-height: 65px;
         }
 
         .security-card a {
@@ -120,11 +113,11 @@
             font-weight: bold;
         }
 
-        .security-card a:hover {
-            background: #5563d6;
+        .danger a {
+            background: #dc3545;
         }
 
-        @media(max-width: 800px) {
+        @media(max-width:800px) {
 
             .security-grid {
                 grid-template-columns: 1fr;
@@ -140,9 +133,14 @@
 
 <div class="navbar">
 
-    <h3>My Dashboard</h3>
+    <h3>
+        Fortify Security Dashboard
+    </h3>
 
-    <form method="POST" action="/logout">
+    <form
+        method="POST"
+        action="/logout"
+    >
 
         @csrf
 
@@ -159,19 +157,29 @@
     <div class="welcome-card">
 
         <div class="avatar">
-            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+
+            {{ strtoupper(
+                substr(
+                    auth()->user()->name,
+                    0,
+                    1
+                )
+            ) }}
+
         </div>
 
-        <h1>Dashboard</h1>
-
-        <p class="welcome">
+        <h1>
             Welcome,
-            <strong>{{ auth()->user()->name }}</strong>
+            {{ auth()->user()->name }}
+        </h1>
+
+        <p>
+            {{ auth()->user()->email }}
         </p>
 
-        <div class="badge">
-            Logged In Successfully
-        </div>
+        <strong>
+            Fortify Authentication & Security
+        </strong>
 
     </div>
 
@@ -179,11 +187,62 @@
 
         <div class="security-card">
 
-            <h2>🔐 Two-Factor Authentication</h2>
+            <h2>
+                📊 Security Overview
+            </h2>
 
             <p>
-                Manage 2FA, QR-code setup, authentication confirmation
-                and recovery codes.
+                View your complete authentication
+                security statistics and recent activity.
+            </p>
+
+            <a href="{{ route('security.overview') }}">
+                Open Overview
+            </a>
+
+        </div>
+
+        <div class="security-card">
+
+            <h2>
+                👤 Profile Management
+            </h2>
+
+            <p>
+                Update your name and email address.
+            </p>
+
+            <a href="{{ route('security.profile') }}">
+                Manage Profile
+            </a>
+
+        </div>
+
+        <div class="security-card">
+
+            <h2>
+                🔐 Change Password
+            </h2>
+
+            <p>
+                Change your password with current-password
+                verification and strength checking.
+            </p>
+
+            <a href="{{ route('security.password') }}">
+                Change Password
+            </a>
+
+        </div>
+
+        <div class="security-card">
+
+            <h2>
+                🛡️ Two-Factor Authentication
+            </h2>
+
+            <p>
+                Manage 2FA, QR setup and recovery codes.
             </p>
 
             <a href="{{ route('security.two-factor') }}">
@@ -194,30 +253,51 @@
 
         <div class="security-card">
 
-            <h2>📋 Login History</h2>
+            <h2>
+                📋 Login History
+            </h2>
 
             <p>
-                Review successful logins, failed authentication attempts,
-                IP addresses and browser information.
+                Search, filter and export login,
+                failed and logout activity.
             </p>
 
             <a href="{{ route('security.login-history') }}">
-                View Activity
+                View History
             </a>
 
         </div>
 
         <div class="security-card">
 
-            <h2>💻 Active Sessions</h2>
+            <h2>
+                💻 Active Sessions
+            </h2>
 
             <p>
-                Review active devices and sessions and revoke sessions
-                that you no longer want to keep active.
+                Search active devices and revoke
+                unwanted sessions.
             </p>
 
             <a href="{{ route('security.sessions') }}">
                 Manage Sessions
+            </a>
+
+        </div>
+
+        <div class="security-card danger">
+
+            <h2>
+                🗑️ Delete Account
+            </h2>
+
+            <p>
+                Permanently delete your account after
+                confirming your password.
+            </p>
+
+            <a href="{{ route('security.delete-account') }}">
+                Delete Account
             </a>
 
         </div>
