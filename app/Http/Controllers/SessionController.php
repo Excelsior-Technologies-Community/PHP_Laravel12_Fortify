@@ -52,7 +52,7 @@ class SessionController extends Controller
         $sessionData = $sessions->map(
             function ($session) use ($currentSessionId) {
 
-                return [
+                return (object) [
                     'id' => $session->id,
                     'ip_address' => $session->ip_address,
                     'user_agent' => $session->user_agent,

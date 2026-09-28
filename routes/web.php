@@ -2,10 +2,15 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthenticationActivityController;
+use App\Http\Controllers\AvatarController;
+use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\TwoFactorController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +44,7 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Profile Management
+    | Profile Management & Avatar
     |--------------------------------------------------------------------------
     */
 
@@ -52,6 +57,16 @@ Route::middleware(['auth'])->group(function () {
         '/security/profile',
         [ProfileController::class, 'update']
     )->name('security.profile.update');
+
+    Route::post(
+        '/security/avatar',
+        [AvatarController::class, 'update']
+    )->name('security.avatar.update');
+
+    Route::post(
+        '/security/theme',
+        [ThemeController::class, 'update']
+    )->name('security.theme.update');
 
     /*
     |--------------------------------------------------------------------------
@@ -79,6 +94,74 @@ Route::middleware(['auth'])->group(function () {
         '/security',
         [SecurityController::class, 'index']
     )->name('security.overview');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Roles & Permissions (RBAC)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/security/roles',
+        [RolePermissionController::class, 'index']
+    )->name('security.roles');
+
+    Route::post(
+        '/security/roles',
+        [RolePermissionController::class, 'storeRole']
+    )->name('security.roles.store');
+
+    Route::post(
+        '/security/roles/user/{user}',
+        [RolePermissionController::class, 'updateUserRole']
+    )->name('security.roles.user.update');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Teams & Multi-Tenancy Workspaces
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/security/teams',
+        [TeamController::class, 'index']
+    )->name('security.teams');
+
+    Route::post(
+        '/security/teams',
+        [TeamController::class, 'store']
+    )->name('security.teams.store');
+
+    Route::post(
+        '/security/teams/{team}/switch',
+        [TeamController::class, 'switchTeam']
+    )->name('security.teams.switch');
+
+    Route::post(
+        '/security/teams/{team}/invite',
+        [TeamController::class, 'inviteMember']
+    )->name('security.teams.invite');
+
+    Route::post(
+        '/security/teams/{team}/remove/{user}',
+        [TeamController::class, 'removeMember']
+    )->name('security.teams.remove');
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Impersonation ("Login As User")
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/security/impersonate/stop',
+        [ImpersonationController::class, 'stop']
+    )->name('security.impersonate.stop');
+
+    Route::post(
+        '/security/impersonate/{user}',
+        [ImpersonationController::class, 'impersonate']
+    )->name('security.impersonate');
 
     /*
     |--------------------------------------------------------------------------
